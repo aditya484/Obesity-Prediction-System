@@ -1,0 +1,50 @@
+# =============================================
+#   Obesity Prediction System — .gitignore
+# =============================================
+
+# --- IDE / Editor ---
+.idea/
+.vscode/
+*.code-workspace
+
+# --- Virtual Environment ---
+.venv/
+venv/
+env/
+
+# --- Python Cache ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# --- Jupyter Notebook Checkpoints ---
+.ipynb_checkpoints/
+
+# --- Trained Model Files (large binaries) ---
+model/*.pkl
+model/*.joblib
+
+# --- Dataset (large CSV — download from Kaggle) ---
+dataset/*.csv
+
+# --- Generated Output Visuals ---
+outputs/
+
+# --- Paper Images ---
+paper_images/
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs & Temp Files ---
+*.log
+*.tmp
+*.bak
+
+# --- Environment Variables ---
+.env
+.env.*

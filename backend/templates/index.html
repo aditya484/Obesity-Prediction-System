@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ObesiCheck | Premium Obesity Risk Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-theme="light">
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path></svg>
+                </div>
+                <h2>ObesiCheck</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" id="nav-new-prediction">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    <span>New Assessment</span>
+                </button>
+                <button class="nav-item" id="nav-history">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>History</span>
+                </button>
+            </nav>
+
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" />
+                    <div class="slider round"></div>
+                </label>
+                <span class="theme-text" style="margin-left: 10px;">Dark Mode</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h1>Health Assessment</h1>
+                    <p class="subtitle">AI-powered predictive modeling for obesity risk</p>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- WIZARD VIEW -->
+                <div id="prediction-view" class="view active-view">
+                    <div class="wizard-container glass-panel">
+                        <div class="progress-container">
+                            <div class="progress-track">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="steps-indicators">
+                                <div class="step-indicator active" data-step="1">1. Bio</div>
+                                <div class="step-indicator" data-step="2">2. Diet</div>
+                                <div class="step-indicator" data-step="3">3. Lifestyle</div>
+                            </div>
+                        </div>
+
+                        <form id="predictionForm">
+                            <!-- STEP 1 -->
+                            <div class="wizard-step active-step" id="step1">
+                                <h3>Biological & Demographics</h3>
+                                <p class="step-desc">Help us gauge your baseline physical metrics.</p>
+                                
+                                <div class="grid-2">
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="Age">Age (Years)</label>
+                                        </div>
+                                        <input type="number" id="Age" name="Age" min="10" max="100" value="25" class="select-input">
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="Gender">Gender</label>
+                                        </div>
+                                        <select id="Gender" name="Gender" class="select-input">
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="Height">Height (m)</label>
+                                        </div>
+                                        <input type="number" step="0.01" id="Height" name="Height" min="1.0" max="2.5" value="1.70" class="select-input">
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="Weight">Weight (kg)</label>
+                                        </div>
+                                        <input type="number" step="0.1" id="Weight" name="Weight" min="20" max="250" value="70" class="select-input">
+                                    </div>
+                                </div>
+
+                                <div class="bmi-live-card">
+                                    <div class="bmi-info">
+                                        <h4>Estimated BMI</h4>
+                                        <p>Based on your height and weight inputs.</p>
+                                    </div>
+                                    <div class="bmi-value" id="bmiLiveValue">24.2</div>
+                                </div>
+
+                                <div class="input-group mt-4">
+                                    <div class="label-row">
+                                        <label>Family history of overweight?</label>
+                                    </div>
+                                    <div class="segmented-control">
+                                        <input type="radio" id="fam-yes" name="family_history_with_overweight" value="yes" checked>
+                                        <label for="fam-yes">Yes</label>
+                                        <input type="radio" id="fam-no" name="family_history_with_overweight" value="no">
+                                        <label for="fam-no">No</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 2 -->
+                            <div class="wizard-step" id="step2">
+                                <h3>Dietary Habits</h3>
+                                <p class="step-desc">Tell us about your eating patterns and hydration.</p>
+
+                                <div class="grid-2">
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label>Eat high caloric food often? (FAVC)</label>
+                                        </div>
+                                        <div class="segmented-control">
+                                            <input type="radio" id="favc-yes" name="FAVC" value="yes" checked>
+                                            <label for="favc-yes">Yes</label>
+                                            <input type="radio" id="favc-no" name="FAVC" value="no">
+                                            <label for="favc-no">No</label>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="FCVC">Veggie Intake (1-5)</label>
+                                        </div>
+                                        <input type="number" id="FCVC" name="FCVC" min="1" max="5" value="2" class="select-input">
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="NCP">Main Meals Daily</label>
+                                        </div>
+                                        <input type="number" step="1" id="NCP" name="NCP" min="1" max="4" value="3" class="select-input">
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="CH2O">Water (Liters)</label>
+                                        </div>
+                                        <input type="number" step="0.1" id="CH2O" name="CH2O" min="1" max="3" value="2" class="select-input">
+                                    </div>
+                                </div>
+
+                                <div class="grid-2 mt-4">
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="CAEC">Snacking between meals</label>
+                                        </div>
+                                        <select id="CAEC" name="CAEC" class="select-input">
+                                            <option value="no">No</option>
+                                            <option value="Sometimes" selected>Sometimes</option>
+                                            <option value="Frequently">Frequently</option>
+                                            <option value="Always">Always</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="CALC">Alcohol Consumption</label>
+                                        </div>
+                                        <select id="CALC" name="CALC" class="select-input">
+                                            <option value="no" selected>No</option>
+                                            <option value="Sometimes">Sometimes</option>
+                                            <option value="Frequently">Frequently</option>
+                                            <option value="Always">Always</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 3 -->
+                            <div class="wizard-step" id="step3">
+                                <h3>Lifestyle & Physical Activity</h3>
+                                <p class="step-desc">Detailed metrics on how you spend your day.</p>
+
+                                <div class="grid-2">
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label>Do you smoke?</label>
+                                        </div>
+                                        <div class="segmented-control">
+                                            <input type="radio" id="smoke-yes" name="SMOKE" value="yes">
+                                            <label for="smoke-yes">Yes</label>
+                                            <input type="radio" id="smoke-no" name="SMOKE" value="no" checked>
+                                            <label for="smoke-no">No</label>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label>Monitor Caloric Intake? (SCC)</label>
+                                        </div>
+                                        <div class="segmented-control">
+                                            <input type="radio" id="scc-yes" name="SCC" value="yes">
+                                            <label for="scc-yes">Yes</label>
+                                            <input type="radio" id="scc-no" name="SCC" value="no" checked>
+                                            <label for="scc-no">No</label>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="FAF">Physical Activity Days/Wk</label>
+                                        </div>
+                                        <input type="number" step="1" id="FAF" name="FAF" min="0" max="7" value="1" class="select-input">
+                                    </div>
+                                    <div class="input-group">
+                                        <div class="label-row">
+                                            <label for="TUE">Tech Device Usage Level</label>
+                                        </div>
+                                        <input type="number" step="1" id="TUE" name="TUE" min="0" max="2" value="1" class="select-input">
+                                    </div>
+                                </div>
+
+                                <div class="input-group mt-4">
+                                    <div class="label-row">
+                                        <label for="MTRANS">Primary Transportation Mode</label>
+                                    </div>
+                                    <select id="MTRANS" name="MTRANS" class="select-input">
+                                        <option value="Automobile">Automobile</option>
+                                        <option value="Motorbike">Motorbike</option>
+                                        <option value="Bike">Bike</option>
+                                        <option value="Public_Transportation" selected>Public Transportation</option>
+                                        <option value="Walking">Walking</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-footer">
+                                <button type="button" class="btn btn-ghost" id="prevBtn">Back</button>
+                                <button type="button" class="btn btn-primary" id="nextBtn">Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 8px;"><path d="M5 12h14m-7-7 7 7-7 7"></path></svg></button>
+                                <button type="submit" class="btn btn-accent" id="submitBtn" style="display: none;">Generate Report <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 8px;"><path d="M5 12h14m-7-7 7 7-7 7"></path></svg></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- RESULTS VIEW -->
+                <div id="result-view" class="view hidden">
+                    <div class="result-header">
+                        <h2>Assessment Generated</h2>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button class="btn btn-outline" id="downloadReportBtn">Download PDF</button>
+                            <button class="btn btn-outline" id="retakeBtn">Retake Assessment</button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-grid">
+                        <div class="dash-card primary-outcome">
+                            <div class="status-indicator" id="statusIndicator"></div>
+                            <h3>Risk Category</h3>
+                            <h1 id="resultLabel" class="gradient-text">Loading...</h1>
+                            <div class="bmi-pill">Calculated BMI: <strong id="resultBmi">0</strong></div>
+                        </div>
+
+                        <div class="dash-card">
+                            <h3>Health Recommendation</h3>
+                            <p id="suggestionText" class="recommendation-text">Analyzing your metrics to provide tailored health considerations...</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid mt-4">
+                        <div class="dash-card">
+                            <h3>Lifestyle Analysis</h3>
+                            <div class="chart-container">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="dash-card info-card">
+                            <h3>Understanding the Metrics</h3>
+                            <ul class="info-list">
+                                <li><strong>BMI (Body Mass Index):</strong> Calculated via Weight / Height². Indicates typical mass ranges.</li>
+                                <li><strong>Hydration (CH2O):</strong> Proper intake crucial for metabolic functions. Aim for >2L daily.</li>
+                                <li><strong>Physical Activity (FAF):</strong> Moderate to vigorous activity strongly correlates with lower obesity risk.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- CLASSIFICATION REFERENCE CARD -->
+                    <div class="dashboard-grid mt-4">
+                        <div class="dash-card info-card" style="grid-column: 1 / -1;">
+                            <h3>Obesity Classifications Reference</h3>
+                            <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                This AI assessment categorizes physical risk into globally recognized classes based on Body Mass Index (BMI) ranges and correlated lifestyle factors derived from standard medical datasets.
+                            </p>
+                            <div class="classifications-table">
+                                <div class="class-row">
+                                    <span class="class-name" style="color: #60a5fa;">Insufficient Weight</span>
+                                    <span class="class-desc">Below standard BMI (< 18.5). May indicate malnourishment, metabolic constraints, or rapid unintended weight depletion.</span>
+                                </div>
+                                <div class="class-row">
+                                    <span class="class-name" style="color: #4ade80;">Normal Weight</span>
+                                    <span class="class-desc">Healthy BMI zone (18.5 - 24.9). This represents the optimal equilibrium for metabolic stability and cardiovascular longevity.</span>
+                                </div>
+                                <div class="class-row">
+                                    <span class="class-name" style="color: #fbbf24;">Overweight (Level I & II)</span>
+                                    <span class="class-desc">Elevated BMI (25.0 - 29.9). The pre-obesity stage. Warrants lifestyle and dietary interventions to halt upward trajectory.</span>
+                                </div>
+                                <div class="class-row">
+                                    <span class="class-name" style="color: #f43f5e;">Obesity Type I</span>
+                                    <span class="class-desc">BMI (30.0 - 34.9). Low-risk clinical obesity. Characterized by moderate excess adiposity. Dietary reform heavily recommended.</span>
+                                </div>
+                                <div class="class-row">
+                                    <span class="class-name" style="color: #e11d48;">Obesity Type II</span>
+                                    <span class="class-desc">BMI (35.0 - 39.9). Moderate-risk obesity. Strongly correlated with chronic conditions like hypertension, dyslipidemia, and type 2 diabetes.</span>
+                                </div>
+                                <div class="class-row">
+                                    <span class="class-name" style="color: #be123c;">Obesity Type III</span>
+                                    <span class="class-desc">BMI (40.0+). Severe or 'morbid' obesity. High-risk category. Often requires aggressive, sustained medical or surgical intervention.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HISTORY VIEW -->
+                <div id="history-view" class="view hidden">
+                    <div class="glass-panel">
+                        <div class="history-header">
+                            <h2>Your Timeline</h2>
+                            <button class="btn btn-ghost" id="clearHistoryBtn">Clear History</button>
+                        </div>
+                        <div id="historyList" class="history-list">
+                            <!-- History items injected here via JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
