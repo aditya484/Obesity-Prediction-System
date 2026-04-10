@@ -254,7 +254,7 @@ jupyter notebook notebooks/Obesity_Prediction_EDA_and_Modeling.ipynb
 
 <div align="center">
 
-**Aditya Verma** — *ML Engineer & Full-Stack Developer*
+**Aditya Verma** — *Aspiring ML Engineer*
 
 <br/>
 
